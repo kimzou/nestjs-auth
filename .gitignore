@@ -5,6 +5,9 @@
 # ENV
 .env
 
+# Firebase
+firebase-adminsdk.json
+
 # Logs
 logs
 *.log
