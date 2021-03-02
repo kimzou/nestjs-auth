@@ -1,7 +1,7 @@
 import { Args, Context, GraphQLExecutionContext, Mutation, Resolver } from '@nestjs/graphql';
-import { Auth } from './auth.entity';
+import { User } from 'src/users/user.entity';
+import { User as UserModel } from 'src/users/user.model';
 import { AuthService } from './auth.service';
-import { AuthPayload } from './dto/auth.input';
 import { LoginInput } from './dto/login.input';
 import { RegisterInput } from './dto/register.input';
 
@@ -10,19 +10,19 @@ export class AuthResolvers {
 
   constructor(private authService: AuthService) {}
 
-  @Mutation(returns => Auth)
+  @Mutation(returns => User)
   async register(
     @Args('registerInput') registerInput: RegisterInput,
     @Context() ctx: GraphQLExecutionContext
-  ): Promise<AuthPayload> {
+  ): Promise<UserModel> {
     return this.authService.register({ registerInput, ctx });
   }
 
-  @Mutation(returns => Auth)
+  @Mutation(returns => User)
   async login(
     @Args('loginInput') loginInput: LoginInput,
     @Context() ctx: GraphQLExecutionContext
-  ): Promise<AuthPayload> {
+  ): Promise<UserModel> {
     return this.authService.login({ loginInput, ctx });
   }
 }

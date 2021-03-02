@@ -4,13 +4,12 @@ import { AuthenticationError } from 'apollo-server-core';
 import * as admin from 'firebase-admin';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './../users/user.model';
-import { Auth } from './auth.entity';
 
 @Injectable()
 export class AuthService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) { }
 
-  async register({ registerInput, ctx }) {
+  async register({ registerInput, ctx }): Promise<User> {
     const { email, uid, displayName, idToken } = registerInput;
 
     try {
@@ -31,19 +30,26 @@ export class AuthService {
       const createdUser = new this.userModel(userProp);
       await createdUser.save()
       // create cookie session
-      return await this.session(idToken, ctx)
+      await this.session(idToken, ctx)
+      return createdUser
     } catch (error) {
       console.log('Catch:', error)
     }
   }
 
-  async login({ loginInput, ctx }) {
-    const { idToken } = loginInput;
-    return await this.session(idToken, ctx);
+  async login({ loginInput, ctx }): Promise<User> {
+    const { idToken, uid } = loginInput;
+    let user: UserDocument
+    try {
+      user = await this.userModel.findOne({ firebaseUid: uid })
+    } catch (error) {
+      throw new AuthenticationError(error)
+    }
+    await this.session(idToken, ctx);
+    return user
   }
 
-  async session(idToken: string, ctx): Promise<Auth> {
-    console.log('session')
+  async session(idToken: string, ctx): Promise<void> {
     const expiresIn = 60 * 60 * 24 * 7 * 1000 // 7 days
     try {
       const sessionCookie = await admin
@@ -56,8 +62,6 @@ export class AuthService {
         maxAge: expiresIn
       }
       ctx.res.cookie('session-cookie', sessionCookie, cookieOtp)
-
-      return { idToken: sessionCookie };
     } catch (error) {
       throw new AuthenticationError(error);
     }

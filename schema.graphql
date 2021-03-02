@@ -12,17 +12,13 @@ directive @requires(fields: String!) on FIELD_DEFINITION
 
 directive @provides(fields: String!) on FIELD_DEFINITION
 
-type Auth {
-  idToken: ID!
-}
-
 type User {
   id: ID!
 }
 
 type Mutation {
-  register(registerInput: RegisterInput!): Auth!
-  login(loginInput: LoginInput!): Auth!
+  register(registerInput: RegisterInput!): User!
+  login(loginInput: LoginInput!): User!
 }
 
 input RegisterInput {
@@ -35,4 +31,5 @@ input RegisterInput {
 
 input LoginInput {
   idToken: String!
+  uid: String!
 }
