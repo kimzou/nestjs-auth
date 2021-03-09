@@ -13,6 +13,11 @@ async function bootstrap() {
     })
   });
   const app = await NestFactory.create(AppModule);
+  // authorize cookies to be send
+  app.enableCors({
+    credentials: true,
+      origin: 'http://localhost:3000'
+  });
   app.use(cookieParser());
   await app.listen(4002);
 }

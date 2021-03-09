@@ -42,11 +42,11 @@ export class AuthService {
     let user: UserDocument
     try {
       user = await this.userModel.findOne({ firebaseUid: uid })
+      await this.session(idToken, ctx);
+      return user
     } catch (error) {
       throw new AuthenticationError(error)
     }
-    await this.session(idToken, ctx);
-    return user
   }
 
   async session(idToken: string, ctx): Promise<void> {

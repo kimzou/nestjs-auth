@@ -13,12 +13,12 @@ import { User } from './users/user.entity';
         orphanedTypes: [User],
       },
       autoSchemaFile: 'schema.graphql',
-      // authorize cookies to be send
-      cors: {
-        credentials: true,
-        origin: 'http://localhost:3000'
-      },
-      context: ({ req, res }) => ({ req, res })
+      context: ({ req, res }) => {
+        console.log('context req.hearders', req.headers)
+        const uid = req.headers?.['x-user-uid']
+        console.log('context', { uid })
+        return { req, res }
+      }
     }),
     AuthModule
   ],
