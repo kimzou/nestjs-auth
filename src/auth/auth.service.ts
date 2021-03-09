@@ -17,14 +17,10 @@ export class AuthService {
       const userExists = await this.userModel.findOne({ email });
       if (userExists) throw new AuthenticationError('This email is already used');
 
-      // we have to fetch the user from admin to get the password
-      const { passwordHash = '123456' } = await admin.auth().getUser(uid);
-
       // set new user properties and save it
       const userProp = {
         name: displayName,
         email,
-        password: passwordHash,
         firebaseUid: uid
       }
       const createdUser = new this.userModel(userProp);
