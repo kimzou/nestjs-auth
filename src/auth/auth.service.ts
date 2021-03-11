@@ -9,6 +9,27 @@ import { User, UserDocument } from './../users/user.model';
 export class AuthService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) { }
 
+  //TODO: put method in guard
+  async validateIdToken(idToken: string): Promise<boolean|void>  {
+    try {
+      await admin.auth().verifyIdToken(idToken);
+      return true
+    } catch (error) {
+      throw new AuthenticationError(error);
+    }
+  }
+
+  async setClaims({ uid, id, role }): Promise<void> {
+    try {
+      await admin.auth().setCustomUserClaims(uid, {
+        id,
+        role
+      })
+    } catch (error) {
+      console.log('Catch error setting user claims :', error)
+    }
+  }
+
   async register({ registerInput, ctx }): Promise<User> {
     const { email, uid, displayName, idToken } = registerInput;
 
@@ -25,11 +46,13 @@ export class AuthService {
       }
       const createdUser = new this.userModel(userProp);
       await createdUser.save()
+      // set claims
+      this.setClaims({ uid, id: createdUser._id, role: createdUser.role })
       // create cookie session
       await this.session(idToken, ctx)
       return createdUser
     } catch (error) {
-      console.log('Catch:', error)
+      throw new AuthenticationError(error)
     }
   }
 
