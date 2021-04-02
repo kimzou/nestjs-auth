@@ -7,7 +7,12 @@ import { User, UserDocument } from './../users/user.model';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) { }
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument> ) { }
+
+  // rabbitMQ test
+  getHello() {
+    return 'Hello !!!'
+  }
 
   //TODO: put method in guard
   async validateIdToken(idToken: string): Promise<boolean|void>  {

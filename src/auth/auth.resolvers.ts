@@ -1,4 +1,7 @@
-import { Args, Context, GraphQLExecutionContext, Mutation, Resolver } from '@nestjs/graphql';
+import { Inject } from '@nestjs/common';
+import { Args, Context, GraphQLExecutionContext, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { ClientProxy } from '@nestjs/microservices';
+import { query } from 'express';
 import { User } from 'src/users/user.entity';
 import { User as UserModel } from 'src/users/user.model';
 import { AuthService } from './auth.service';
@@ -8,7 +11,16 @@ import { RegisterInput } from './dto/register.input';
 @Resolver()
 export class AuthResolvers {
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService,
+    @Inject('AUTH_SERVICE') private client: ClientProxy,
+
+    ) {}
+
+  // rabbitMQ test
+  @Query(returns => String)
+  log() {
+    this.client.emit('log', 'data log')
+  }
 
   @Mutation(returns => User)
   async register(

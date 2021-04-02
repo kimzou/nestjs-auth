@@ -16,6 +16,10 @@ type User {
   id: ID!
 }
 
+type Query {
+  log: String!
+}
+
 type Mutation {
   register(registerInput: RegisterInput!): User!
   login(loginInput: LoginInput!): User!
